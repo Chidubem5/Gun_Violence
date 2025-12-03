@@ -1,4 +1,4 @@
-# G_Violence
+# Gun_Violence
 
 This is a project that will allow people to see the gun violence in a different lens.
 Growing up, I have heard about black on black violence and despite his destructive it is, I was curious about white on white crime and even other races, backgrounds which include sex and religion. I know the data for some will be challeneging to secure but it is worth a try. I have found ways to get useful data and am curious if this will be the same. 
