@@ -1,13 +1,19 @@
-# Gun Violence
+# Gun Violence Heat Map
 
-This is a project that will allow people to see the gun violence in a different lens.
-Growing up, I have heard about black on black violence and despite his destructive it is, I was curious about white on white crime and even other races, backgrounds which include sex and religion. I know the data for some will be challeneging to secure but it is worth a try. I have found ways to get useful data and am curious if this will be the same. 
-
-This is a focus on Gun Violence and how times have changed.
+This project explores U.S. gun deaths through an interactive heat map with breakdowns by state, race, and sex over time. The goal is to make patterns visible and comparable across geography and demographics while keeping the focus on population‑adjusted rates.
 
 Main Features:
-- Heat Map of geospatial data where gun violence is most promiment
-- Can move through time
-- Adjusts well after I have forgotton about this so the sources need to be reliable so likely information from the govt 
-- The guns themselves are not useful to me but it can be added later
-- Proportion of deaths relative to total population per background (Pie Chart)
+- Interactive heat map of gun death rates by state
+- Time slider to move across years
+- Breakdowns by race and sex
+- Clear, reproducible data sources (preferably government datasets)
+
+Next Step:
+- Explore race‑on‑race crimes by pairing perpetrator and victim data. The key challenge is finding a source that includes both in a consistent format so comparisons are accurate.
+
+Limitations:
+- Access to appropriate, consistently defined perpetrator/victim data is limited and often fragmented across sources.
+
+Policy Context (Data Availability):
+- In January 2025, White House actions targeted what the administration called “gender ideology” in the federal government and rescinded prior federal equity initiatives. One executive order defined federal sex terminology in binary terms, and another rescinded earlier equity‑related orders.
+- Agencies subsequently reviewed or pulled material tied to gender identity, LGBT health, DEI, and related public health topics. Reporting at the time noted that some CDC pages and datasets (e.g., HIV, youth health, and other public health resources) were removed or revised during compliance reviews.
