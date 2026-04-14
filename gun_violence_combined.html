@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>US Gun Violence — Heat Map + State Rankings</title>
 <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 <style>
@@ -19,6 +20,21 @@ body{background:#1a1a1a;color:#eee;font-family:Arial,sans-serif;height:100vh;dis
 #playBtn:hover{background:#e74c3c;}
 #yearLabel{color:#fff;font-size:13px;font-weight:bold;width:40px;flex-shrink:0;}
 #yearSlider{flex:1;accent-color:#e74c3c;cursor:pointer;}
+
+@media(max-width:640px){
+  body{height:auto;overflow-y:auto;}
+  #header h1{font-size:13px;}
+  #header p{font-size:10px;}
+  #top-controls{flex-direction:column;gap:8px;padding:8px 12px;}
+  #catSelect{min-width:0;width:100%;font-size:14px;padding:7px 10px;}
+  #map-div{flex:0 0 auto;height:52vw;min-height:220px;}
+  #bar-div{flex:0 0 auto;height:460px;}
+  #controls{gap:8px;padding:6px 10px 10px;}
+  #playBtn{padding:8px 18px;font-size:14px;}
+  #yearLabel{font-size:14px;}
+  #yearSlider{height:28px;}
+  #top-controls label{font-size:13px;}
+}
 </style></head><body>
 <div id="header">
   <h1>US Firearm Deaths per 100k — Heat Map + State Rankings &nbsp;·&nbsp; 1999–2024</h1>
