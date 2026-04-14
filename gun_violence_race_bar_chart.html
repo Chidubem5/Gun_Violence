@@ -117,7 +117,7 @@ function buildChart(race) {
         {
           label: '▶ Play',
           method: 'animate',
-          args: [null, { fromcurrent: true, transition: { duration: 300 }, frame: { duration: 500, redraw: true } }]
+          args: [null, { fromcurrent: true, transition: { duration: 0 }, frame: { duration: 600, redraw: true } }]
         },
         {
           label: '⏸ Pause',
@@ -130,7 +130,7 @@ function buildChart(race) {
       active: 0,
       steps: availYears.map((y, i) => ({
         label: y, method: 'animate',
-        args: [[y], { mode: 'immediate', transition: { duration: 200 }, frame: { duration: 300, redraw: true } }]
+        args: [[y], { mode: 'immediate', transition: { duration: 0 }, frame: { duration: 0, redraw: true } }]
       })),
       x: 0.05, len: 0.95,
       y: -0.12,
