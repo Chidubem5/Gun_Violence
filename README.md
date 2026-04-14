@@ -17,6 +17,27 @@
 
 This project explores U.S. gun deaths through an interactive heat map with breakdowns by state, race, and sex over time. The goal is to make patterns visible and comparable across geography and demographics while keeping the focus on population‑adjusted rates.
 
+### How "Gun Death" Is Defined
+
+All deaths are drawn from CDC WONDER Underlying Cause of Death data. A death is counted as a gun death if its ICD‑10 underlying cause code is one of the following 12 codes:
+
+| Code | Description |
+|------|-------------|
+| W32 | Accidental handgun discharge |
+| W33 | Accidental rifle, shotgun, and larger firearm discharge |
+| W34 | Accidental discharge from other and unspecified firearms |
+| X72 | Intentional self‑harm by handgun discharge |
+| X73 | Intentional self‑harm by rifle, shotgun, and larger firearm discharge |
+| X74 | Intentional self‑harm by other and unspecified firearm discharge |
+| X93 | Assault by handgun discharge |
+| X94 | Assault by rifle, shotgun, and larger firearm discharge |
+| X95 | Assault by other and unspecified firearm discharge |
+| Y22 | Handgun discharge, undetermined intent |
+| Y23 | Rifle, shotgun, and larger firearm discharge, undetermined intent |
+| Y24 | Other and unspecified firearm discharge, undetermined intent |
+
+Together these cover every manner of death (accident, suicide, homicide, and undetermined intent) in which a firearm was the underlying cause.
+
 Main Features:
 - Interactive heat map of gun death rates by state
 - Time slider to move across years
