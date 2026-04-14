@@ -16,7 +16,7 @@ body{background:#1a1a1a;color:#eee;font-family:Arial,sans-serif;height:100vh;dis
 #map-div{flex:0 0 50%;min-height:0;}
 #bar-div{flex:1;min-height:0;}
 #controls{display:flex;align-items:center;gap:10px;padding:4px 14px 6px;flex-shrink:0;background:#111;border-top:1px solid #2a2a2a;}
-#playBtn{background:#c0392b;color:#fff;border:none;border-radius:4px;padding:4px 12px;font-size:12px;cursor:pointer;flex-shrink:0;}
+#playBtn{background:#c0392b;color:#fff;border:none;border-radius:4px;padding:4px 0;font-size:18px;cursor:pointer;flex-shrink:0;width:38px;text-align:center;line-height:1.3;}
 #playBtn:hover{background:#e74c3c;}
 #yearLabel{color:#fff;font-size:13px;font-weight:bold;width:40px;flex-shrink:0;}
 #yearSlider{flex:1;accent-color:#e74c3c;cursor:pointer;}
@@ -30,7 +30,7 @@ body{background:#1a1a1a;color:#eee;font-family:Arial,sans-serif;height:100vh;dis
   #map-div{flex:0 0 auto;height:52vw;min-height:220px;}
   #bar-div{flex:0 0 auto;height:460px;}
   #controls{gap:8px;padding:6px 10px 10px;}
-  #playBtn{padding:8px 18px;font-size:14px;}
+  #playBtn{padding:6px 0;font-size:20px;width:44px;}
   #yearLabel{font-size:14px;}
   #yearSlider{height:28px;}
   #top-controls label{font-size:13px;}
@@ -64,7 +64,7 @@ body{background:#1a1a1a;color:#eee;font-family:Arial,sans-serif;height:100vh;dis
 <div id="map-div"></div>
 <div id="bar-div"></div>
 <div id="controls">
-  <button id="playBtn">▶ Play</button>
+  <button id="playBtn" title="Play">▶</button>
   <span id="yearLabel">1999</span>
   <input type="range" id="yearSlider" min="0" max="25" value="0" step="1">
 </div>
@@ -155,11 +155,11 @@ function setCategory(cat){
   update(currentIdx);
 }
 document.getElementById('yearSlider').addEventListener('input',function(){stopPlay();update(parseInt(this.value));});
-function stopPlay(){playing=false;clearInterval(playTimer);document.getElementById('playBtn').textContent='▶ Play';}
+function stopPlay(){playing=false;clearInterval(playTimer);const b=document.getElementById('playBtn');b.textContent='▶';b.title='Play';}
 document.getElementById('playBtn').addEventListener('click',function(){
   if(playing){stopPlay();}
   else{
-    playing=true;this.textContent='⏸ Pause';
+    playing=true;this.textContent='⏸';this.title='Pause';
     const avail=Object.keys(CATS[currentCat]).map(y=>YEARS.indexOf(y)).filter(i=>i>=0).sort((a,b)=>a-b);
     let pos=avail.findIndex(i=>i>=currentIdx);if(pos<0||pos>=avail.length-1)pos=0;
     playTimer=setInterval(function(){pos++;if(pos>=avail.length){stopPlay();return;}update(avail[pos]);},700);

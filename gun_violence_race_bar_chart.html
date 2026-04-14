@@ -9,6 +9,7 @@ h1{text-align:center;font-size:17px;padding:14px 0 2px;color:#fff;}
 p.sub{text-align:center;font-size:12px;color:#999;margin-bottom:8px;}
 #controls{text-align:center;margin-bottom:6px;}
 #controls label{font-size:13px;color:#ccc;margin-right:8px;}
+#playBtn{background:#c0392b;color:#fff;border:none;border-radius:4px;padding:4px 0;font-size:18px;cursor:pointer;width:38px;text-align:center;line-height:1.3;vertical-align:middle;margin-left:10px;}
 #raceSelect{background:#2a2a2a;color:#fff;border:1px solid #555;padding:5px 12px;font-size:13px;border-radius:4px;cursor:pointer;}
 #chart{width:100%;height:640px;}
 
@@ -18,6 +19,7 @@ p.sub{text-align:center;font-size:12px;color:#999;margin-bottom:8px;}
   #controls{margin-bottom:10px;}
   #controls label{font-size:14px;}
   #raceSelect{padding:8px 14px;font-size:14px;}
+  #playBtn{padding:6px 0;font-size:20px;width:44px;}
   #chart{height:500px;}
 }
 </style></head><body>
@@ -25,7 +27,8 @@ p.sub{text-align:center;font-size:12px;color:#999;margin-bottom:8px;}
 <p class="sub">Rates are proportional to each race group's actual population size &nbsp;·&nbsp; Sorted highest → lowest &nbsp;·&nbsp; 1999–2024</p>
 <div id="controls">
   <label for="raceSelect">Race group:</label>
-  <select id="raceSelect" onchange="buildChart(this.value)"></select>
+  <select id="raceSelect" onchange="rcStop();buildChart(this.value)"></select>
+  <button id="playBtn" title="Play" onclick="rcToggle()">▶</button>
 </div>
 <div id="chart"></div>
 <script>
@@ -61,12 +64,7 @@ function buildChart(race){
     xaxis:{title:'Deaths per 100k (race population)',titlefont:{size:11},tickfont:{size:9,color:'#aaa'},gridcolor:'#333',zeroline:false,range:[0,maxRate*1.18]},
     yaxis:{tickfont:{size:9,color:'#ccc'},autorange:'reversed',gridcolor:'#333'},
     margin:{t:4,b:40,l:140,r:60},showlegend:false,bargap:0.25,
-    updatemenus:[{type:'buttons',showactive:false,x:0.05,xanchor:'left',y:-0.1,yanchor:'top',
-      bgcolor:'#333',bordercolor:'#555',font:{color:'#fff'},
-      buttons:[
-        {label:'▶ Play',method:'animate',args:[null,{fromcurrent:true,transition:{duration:0},frame:{duration:650,redraw:true}}]},
-        {label:'⏸ Pause',method:'animate',args:[[null],{mode:'immediate',transition:{duration:0},frame:{duration:0,redraw:false}}]}
-      ]}],
+    updatemenus:[],
     sliders:[{active:0,steps:avail.map((y,i)=>
       ({label:y,method:'animate',args:[[y],{mode:'immediate',transition:{duration:0},frame:{duration:0,redraw:true}}]})),
       x:0.05,len:0.95,y:-0.04,
@@ -79,8 +77,23 @@ function buildChart(race){
     text:first.r.map(r=>`${r}`),textposition:'outside',textfont:{size:9,color:'#ccc'},
     customdata:first.r.map((r,i)=>`<b>${first.s[i]}</b><br>Rate: <b>${r}/100k</b> of ${race} pop<br>Deaths: ${first.d[i].toLocaleString()}<br>${race} population: ${first.p[i].toLocaleString()}`),
     hovertemplate:'%{customdata}<extra></extra>'
-  }],layout,{responsive:true,displayModeBar:false}).then(()=>Plotly.addFrames('chart',frames));
+  }],layout,{responsive:true,displayModeBar:false}).then(()=>{
+    Plotly.addFrames('chart',frames);
+    document.getElementById('chart').on('plotly_animated',function(){
+      rcPlaying=false;const b=document.getElementById('playBtn');b.textContent='▶';b.title='Play';
+    });
+  });
 }
+let rcPlaying=false;
+function rcPlay(){
+  rcPlaying=true;const b=document.getElementById('playBtn');b.textContent='⏸';b.title='Pause';
+  Plotly.animate('chart',null,{fromcurrent:true,transition:{duration:0},frame:{duration:650,redraw:true}});
+}
+function rcStop(){
+  rcPlaying=false;const b=document.getElementById('playBtn');if(b){b.textContent='▶';b.title='Play';}
+  Plotly.animate('chart',[null],{mode:'immediate',transition:{duration:0},frame:{duration:0,redraw:false}});
+}
+function rcToggle(){if(rcPlaying){rcStop();}else{rcPlay();}}
 const sel=document.getElementById('raceSelect');
 Object.keys(ALL_DATA).forEach(r=>{const o=document.createElement('option');o.value=r;o.text=r;sel.appendChild(o);});
 buildChart(Object.keys(ALL_DATA)[0]);
