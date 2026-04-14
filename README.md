@@ -1,5 +1,11 @@
 # Gun Violence Heat Map
 
+## [► View the Interactive Map](https://chidubem5.github.io/Gun_Violence/gun_violence_heatmap.html)
+
+> Click the link above to open the live heatmap — no code or installs needed. Hover over any state to see gun death totals, race breakdown, and sex breakdown. Use the slider to move through years 1999–2024.
+
+---
+
 This project explores U.S. gun deaths through an interactive heat map with breakdowns by state, race, and sex over time. The goal is to make patterns visible and comparable across geography and demographics while keeping the focus on population‑adjusted rates.
 
 Main Features:
