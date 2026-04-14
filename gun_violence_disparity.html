@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<title>Gun Deaths — Proportional Impact by Race & Sex</title>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#1a1a1a;color:#eee;font-family:Arial,sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+#header{text-align:center;padding:8px 12px 3px;flex-shrink:0;background:#111;border-bottom:1px solid #2a2a2a;}
+#header h1{font-size:14px;color:#fff;margin-bottom:2px;}
+#header p{font-size:10px;color:#777;}
+#top-bar{display:flex;align-items:center;justify-content:center;gap:20px;padding:5px 20px;flex-shrink:0;background:#1d1d1d;border-bottom:1px solid #2a2a2a;}
+#top-bar label{font-size:12px;color:#aaa;}
+.seg-btn{background:#2a2a2a;color:#aaa;border:1px solid #444;padding:4px 18px;font-size:12px;border-radius:4px;cursor:pointer;}
+.seg-btn.active{background:#c0392b;color:#fff;border-color:#c0392b;}
+#bar-div{flex:0 0 46%;min-height:0;}
+#divider{height:1px;background:#2a2a2a;flex-shrink:0;}
+#trend-div{flex:1;min-height:0;}
+#controls{display:flex;align-items:center;gap:10px;padding:4px 14px 6px;flex-shrink:0;background:#111;border-top:1px solid #2a2a2a;}
+#playBtn{background:#c0392b;color:#fff;border:none;border-radius:4px;padding:4px 12px;font-size:12px;cursor:pointer;flex-shrink:0;}
+#playBtn:hover{background:#e74c3c;}
+#yearLabel{color:#fff;font-size:13px;font-weight:bold;width:40px;flex-shrink:0;}
+#yearSlider{flex:1;accent-color:#e74c3c;cursor:pointer;}
+</style></head><body>
+
+<div id="header">
+  <h1>Who Bears the Burden? — Gun Deaths Relative to Population Share &nbsp;·&nbsp; 1999–2024</h1>
+  <p>
+    Top: % of national population vs % of gun deaths for each group — wider gap = greater disproportionate impact &nbsp;·&nbsp;
+    Bottom: death rate per 100k of each group's own population over time
+  </p>
+</div>
+<div id="top-bar">
+  <label>View by:</label>
+  <button class="seg-btn active" id="btn-race" onclick="switchView('race')">By Race</button>
+  <button class="seg-btn"        id="btn-sex"  onclick="switchView('sex')">By Sex</button>
+</div>
+<div id="bar-div"></div>
+<div id="divider"></div>
+<div id="trend-div"></div>
+<div id="controls">
+  <button id="playBtn">▶ Play</button>
+  <span id="yearLabel">1999</span>
+  <input type="range" id="yearSlider" min="0" max="25" value="0" step="1">
+</div>
+
+<script>
+const RACE_BAR   = {"1999": {"groups": ["Black / AA", "White", "Amer. Indian / AK", "Asian / PI"], "pop_share": [15.93, 98.53, 0.67, 3.18], "death_share": [24.29, 74.2, 0.53, 0.98], "rate": [36.53, 18.04, 18.78, 7.38], "ratio": [1.52, 0.75, 0.78, 0.31], "deaths": [6841, 20898, 148, 276], "pop": [18728042, 115822803, 787895, 3741276]}, "2000": {"groups": ["Black / AA", "White", "Amer. Indian / AK", "Asian / PI"], "pop_share": [16.06, 99.49, 0.62, 3.38], "death_share": [24.54, 74.03, 0.46, 0.97], "rate": [36.49, 17.78, 17.94, 6.86], "ratio": [1.53, 0.74, 0.75, 0.29], "deaths": [6864, 20709, 130, 272], "pop": [18808860, 116492023, 724541, 3963155]}, "2001": {"groups": ["Black / AA", "White", "Amer. Indian / AK", "Asian / PI"], "pop_share": [15.53, 95.17, 0.61, 3.06], "death_share": [24.32, 74.47, 0.46, 0.76], "rate": [36.62, 18.29, 17.67, 5.77], "ratio": [1.57, 0.78, 0.76, 0.25], "deaths": [7013, 21473, 132, 218], "pop": [19153054, 117401602, 747069, 3775008]}, "2002": {"groups": ["Black / AA", "White", "Amer. Indian / AK", "Asian / PI"], "pop_share": [16.38, 98.87, 0.72, 3.51], "death_share": [25.24, 73.32, 0.6, 0.84], "rate": [38.13, 18.35, 20.67, 5.95], "ratio": [1.54, 0.74, 0.84, 0.24], "deaths": [7451, 21647, 177, 249], "pop": [19539552, 117977499, 856306, 4185607]}, "2003": {"groups": ["Black / AA", "White", "Amer. Indian / AK", "Asian / PI"], "pop_share": [16.53, 99.28, 0.66, 3.61], "death_share": [25.42, 73.1, 0.52, 0.95], "rate": [37.7, 18.06, 19.52, 6.47], "ratio": [1.54, 0.74, 0.8, 0.26], "deaths": [7467, 21471, 154, 280], "pop": [19804759, 118915665, 789097, 4326004]}, "2004": {"groups": ["Black / AA", "White", "Amer. Indian / AK", "Asian / PI"], "pop_share": [16.25, 96.99, 0.76, 3.46], "death_share": [25.21, 73.37, 0.58, 0.84], "rate": [36.27, 17.69, 17.85, 5.69], "ratio": [1.55, 0.76, 0.76, 0.24], "deaths": [7269, 21159, 168, 243], "pop": [20039298, 119625530, 941169, 4269741]}, "2005": {"groups": ["Black / AA", "White", "Amer. Indian / AK", "Asian / PI"], "pop_share": [16.62, 98.26, 0.77, 3.86], "death_share": [26.05, 72.42, 0.61, 0.92], "rate": [38.38, 18.05, 19.51, 5.84], "ratio": [1.57, 0.74, 0.8, 0.24], "deaths": [7801, 21685, 183, 276], "pop": [20323172, 120129597, 937942, 4722330]}, "2006": {"groups": ["Black / AA", "White", "Amer. Indian / AK", "Asian / PI"], "pop_share": [17.03, 100.37, 0.77, 4.19], "death_share": [27.26, 71.1, 0.54, 1.09], "rate": [39.96, 17.68, 17.58, 6.5], "ratio": [1.6, 0.71, 0.7, 0.26], "deaths": [8210, 21413, 164, 329], "pop": [20547397, 121118642, 932647, 5059657]}, "2007": {"groups": ["Black / AA", "White", "Amer. Indian / AK", "Asian / PI"], "pop_share": [16.25, 94.8, 0.7, 3.31], "death_share": [26.4, 72.33, 0.43, 0.83], "rate": [38.45, 18.06, 14.73, 5.96], "ratio": [1.62, 0.76, 0.62, 0.25], "deaths": [8035, 22017, 132, 254], "pop": [20898966, 121912881, 896315, 4260441]}, "2008": {"groups": ["Black / AA", "White", "Amer. Indian / AK", "Asian / PI"], "pop_share": [16.38, 94.81, 0.72, 3.35], "death_share": [24.82, 73.94, 0.46, 0.78], "rate": [36.16, 18.61, 15.18, 5.56], "ratio": [1.52, 0.78, 0.64, 0.23], "deaths": [7660, 22821, 141, 241], "pop": [21185713, 122653598, 928593, 4336052]}, "2009": {"groups": ["Black / AA", "White", "Amer. Indian / AK", "Asian / PI"], "pop_share": [16.69, 96.19, 0.84, 4.12], "death_share": [23.71, 74.88, 0.54, 0.87], "rate": [33.85, 18.55, 15.27, 5.04], "ratio": [1.42, 0.78, 0.64, 0.21], "deaths": [7247, 22888, 164, 266], "pop": [21408898, 123378281, 1073786, 5278862]}, "2010": {"groups": ["Black / AA", "White", "Amer. Indian / AK", "Asian / PI"], "pop_share": [16.8, 96.09, 0.82, 3.76], "death_share": [23.53, 75.11, 0.59, 0.78], "rate": [33.54, 18.72, 17.01, 4.99], "ratio": [1.4, 0.78, 0.71, 0.21], "deaths": [7273, 23218, 181, 242], "pop": [21681658, 124003532, 1064072, 4847207]}, "2011": {"groups": ["Black / AA", "White", "Amer. Indian / AK", "Asian / PI"], "pop_share": [17.26, 97.43, 0.79, 3.82], "death_share": [23.23, 75.46, 0.52, 0.79], "rate": [33.12, 19.06, 16.22, 5.08], "ratio": [1.35, 0.77, 0.66, 0.21], "deaths": [7314, 23755, 163, 248], "pop": [22080646, 124635438, 1005240, 4884712]}, "2012": {"groups": ["Black / AA", "White", "Amer. Indian / AK", "Asian / PI"], "pop_share": [17.77, 99.66, 0.91, 4.44], "death_share": [23.87, 74.57, 0.59, 0.97], "rate": [34.96, 19.48, 17.01, 5.67], "ratio": [1.34, 0.75, 0.65, 0.22], "deaths": [7802, 24375, 194, 316], "pop": [22314351, 125117392, 1140572, 5574776]}, "2013": {"groups": ["Black / AA", "White", "Amer. Indian / AK", "Asian / PI"], "pop_share": [18.12, 101.38, 0.89, 5.23], "death_share": [23.08, 75.4, 0.6, 0.92], "rate": [33.67, 19.66, 17.62, 4.66], "ratio": [1.27, 0.74, 0.67, 0.18], "deaths": [7559, 24697, 195, 302], "pop": [22449011, 125615681, 1106872, 6485871]}, "2014": {"groups": ["Black / AA", "White", "Amer. Indian / AK", "Asian / PI"], "pop_share": [17.67, 97.91, 0.89, 4.23], "death_share": [23.02, 75.59, 0.6, 0.8], "rate": [33.02, 19.57, 16.89, 4.8], "ratio": [1.3, 0.77, 0.67, 0.19], "deaths": [7529, 24724, 195, 262], "pop": [22800647, 126343574, 1154693, 5455484]}, "2015": {"groups": ["Black / AA", "White", "Amer. Indian / AK", "Asian / PI"], "pop_share": [18.66, 102.5, 0.98, 5.69], "death_share": [24.99, 73.4, 0.65, 0.96], "rate": [38.17, 20.41, 18.89, 4.81], "ratio": [1.34, 0.72, 0.66, 0.17], "deaths": [8822, 25911, 229, 339], "pop": [23110167, 126939036, 1212047, 7045562]}, "2016": {"groups": ["Black / AA", "White", "Amer. Indian / AK", "Asian / PI"], "pop_share": [18.59, 101.2, 0.94, 5.26], "death_share": [26.29, 71.95, 0.7, 1.06], "rate": [42.35, 21.29, 22.23, 6.05], "ratio": [1.41, 0.71, 0.74, 0.2], "deaths": [9905, 27108, 264, 400], "pop": [23386661, 127327981, 1187437, 6615774]}, "2017": {"groups": ["Black / AA", "White", "Amer. Indian / AK", "Asian / PI"], "pop_share": [18.49, 100.02, 0.93, 5.55], "death_share": [26.02, 72.26, 0.7, 1.03], "rate": [42.66, 21.9, 22.69, 5.62], "ratio": [1.41, 0.72, 0.75, 0.19], "deaths": [10089, 28018, 270, 399], "pop": [23650489, 127914437, 1189788, 7098467]}, "2018": {"groups": ["Black / AA", "White", "Amer. Indian / AK", "Asian", "Native Hawaiian / PI"], "pop_share": [18.38, 101.93, 1.05, 4.32, 0.08], "death_share": [25.23, 73.32, 0.66, 0.75, 0.04], "rate": [42.54, 22.29, 19.52, 5.35, 14.08], "ratio": [1.37, 0.72, 0.63, 0.17, 0.45], "deaths": [9660, 28071, 253, 286, 14], "pop": [22709703, 125960829, 1296254, 5344718, 99430]}, "2019": {"groups": ["Black / AA", "White", "Amer. Indian / AK", "Asian", "Native Hawaiian / PI"], "pop_share": [18.66, 103.16, 0.88, 5.23, 0.08], "death_share": [26.78, 71.82, 0.55, 0.82, 0.03], "rate": [44.8, 21.74, 19.61, 4.89, 11.06], "ratio": [1.43, 0.7, 0.63, 0.16, 0.35], "deaths": [10223, 27419, 210, 313, 11], "pop": [22817290, 126148648, 1070970, 6397617, 99456]}, "2020": {"groups": ["Black / AA", "White", "Amer. Indian / AK", "Asian", "Native Hawaiian / PI"], "pop_share": [19.29, 105.37, 1.02, 5.12, 0.08], "death_share": [31.96, 66.41, 0.78, 0.81, 0.03], "rate": [60.28, 22.93, 28.0, 5.78, 12.8], "ratio": [1.66, 0.63, 0.77, 0.16, 0.35], "deaths": [13930, 28942, 342, 354, 13], "pop": [23108904, 126226399, 1221472, 6128675, 101555]}, "2021": {"groups": ["Black / AA", "White", "Amer. Indian / AK", "Asian", "Native Hawaiian / PI"], "pop_share": [19.84, 107.45, 1.01, 6.53, 0.11], "death_share": [32.54, 65.72, 0.8, 0.88, 0.07], "rate": [66.02, 24.63, 31.84, 5.41, 23.05], "ratio": [1.64, 0.61, 0.79, 0.13, 0.57], "deaths": [15352, 31010, 377, 414, 31], "pop": [23252383, 125923020, 1183861, 7651892, 134497]}, "2022": {"groups": ["Black / AA", "White", "Amer. Indian / AK", "Asian", "Native Hawaiian / PI"], "pop_share": [19.5, 105.01, 0.98, 6.39, 0.11], "death_share": [30.63, 67.58, 0.85, 0.88, 0.06], "rate": [60.8, 24.92, 33.64, 5.33, 20.68], "ratio": [1.57, 0.64, 0.87, 0.14, 0.53], "deaths": [14208, 31353, 396, 408, 28], "pop": [23367639, 125826518, 1177143, 7652357, 135404]}, "2023": {"groups": ["Black / AA", "White", "Amer. Indian / AK", "Asian", "Native Hawaiian / PI"], "pop_share": [20.38, 109.03, 1.29, 7.22, 0.03], "death_share": [29.19, 68.79, 0.9, 1.09, 0.04], "rate": [55.61, 24.5, 27.11, 5.84, 52.4], "ratio": [1.43, 0.63, 0.7, 0.15, 1.35], "deaths": [13132, 30947, 404, 489, 18], "pop": [23615041, 126337428, 1490211, 8367571, 34353]}, "2024": {"groups": ["Black / AA", "White", "Amer. Indian / AK", "Asian", "Native Hawaiian / PI"], "pop_share": [20.37, 107.74, 1.03, 7.39, 0.03], "death_share": [26.87, 71.33, 0.76, 1.02, 0.03], "rate": [47.57, 23.88, 26.7, 4.97, 30.09], "ratio": [1.32, 0.66, 0.74, 0.14, 0.83], "deaths": [11458, 30421, 326, 434, 11], "pop": [24088672, 127389184, 1221071, 8736203, 36559]}};
+const RACE_TREND = {"Black / AA": {"years": [1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024], "rates": [36.53, 36.49, 36.62, 38.13, 37.7, 36.27, 38.38, 39.96, 38.45, 36.16, 33.85, 33.54, 33.12, 34.96, 33.67, 33.02, 38.17, 42.35, 42.66, 42.54, 44.8, 60.28, 66.02, 60.8, 55.61, 47.57], "ratios": [1.52, 1.53, 1.57, 1.54, 1.54, 1.55, 1.57, 1.6, 1.62, 1.52, 1.42, 1.4, 1.35, 1.34, 1.27, 1.3, 1.34, 1.41, 1.41, 1.37, 1.43, 1.66, 1.64, 1.57, 1.43, 1.32]}, "White": {"years": [1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024], "rates": [18.04, 17.78, 18.29, 18.35, 18.06, 17.69, 18.05, 17.68, 18.06, 18.61, 18.55, 18.72, 19.06, 19.48, 19.66, 19.57, 20.41, 21.29, 21.9, 22.29, 21.74, 22.93, 24.63, 24.92, 24.5, 23.88], "ratios": [0.75, 0.74, 0.78, 0.74, 0.74, 0.76, 0.74, 0.71, 0.76, 0.78, 0.78, 0.78, 0.77, 0.75, 0.74, 0.77, 0.72, 0.71, 0.72, 0.72, 0.7, 0.63, 0.61, 0.64, 0.63, 0.66]}, "Amer. Indian / AK": {"years": [1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024], "rates": [18.78, 17.94, 17.67, 20.67, 19.52, 17.85, 19.51, 17.58, 14.73, 15.18, 15.27, 17.01, 16.22, 17.01, 17.62, 16.89, 18.89, 22.23, 22.69, 19.52, 19.61, 28.0, 31.84, 33.64, 27.11, 26.7], "ratios": [0.78, 0.75, 0.76, 0.84, 0.8, 0.76, 0.8, 0.7, 0.62, 0.64, 0.64, 0.71, 0.66, 0.65, 0.67, 0.67, 0.66, 0.74, 0.75, 0.63, 0.63, 0.77, 0.79, 0.87, 0.7, 0.74]}, "Asian / PI": {"years": [1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017], "rates": [7.38, 6.86, 5.77, 5.95, 6.47, 5.69, 5.84, 6.5, 5.96, 5.56, 5.04, 4.99, 5.08, 5.67, 4.66, 4.8, 4.81, 6.05, 5.62], "ratios": [0.31, 0.29, 0.25, 0.24, 0.26, 0.24, 0.24, 0.26, 0.25, 0.23, 0.21, 0.21, 0.21, 0.22, 0.18, 0.19, 0.17, 0.2, 0.19]}, "Asian": {"years": [2018, 2019, 2020, 2021, 2022, 2023, 2024], "rates": [5.35, 4.89, 5.78, 5.41, 5.33, 5.84, 4.97], "ratios": [0.17, 0.16, 0.16, 0.13, 0.14, 0.15, 0.14]}, "Native Hawaiian / PI": {"years": [2018, 2019, 2020, 2021, 2022, 2023, 2024], "rates": [14.08, 11.06, 12.8, 23.05, 20.68, 52.4, 30.09], "ratios": [0.45, 0.35, 0.35, 0.57, 0.53, 1.35, 0.83]}};
+const SEX_BAR    = {"1999": {"groups": ["Male", "Female"], "pop_share": [50.59, 49.41], "death_share": [85.89, 14.11], "rate": [40.67, 6.84], "ratio": [1.7, 0.29], "deaths": [24188, 3975], "pop": [59475937, 58077854]}, "2000": {"groups": ["Male", "Female"], "pop_share": [50.9, 49.1], "death_share": [86.17, 13.83], "rate": [40.45, 6.73], "ratio": [1.69, 0.28], "deaths": [24107, 3868], "pop": [59593314, 57493207]}, "2001": {"groups": ["Male", "Female"], "pop_share": [51.22, 48.78], "death_share": [86.53, 13.47], "rate": [39.49, 6.45], "ratio": [1.69, 0.28], "deaths": [24953, 3883], "pop": [63183002, 60180953]}, "2002": {"groups": ["Male", "Female"], "pop_share": [51.27, 48.73], "death_share": [86.68, 13.32], "rate": [41.83, 6.76], "ratio": [1.69, 0.27], "deaths": [25592, 3932], "pop": [61177532, 58146793]}, "2003": {"groups": ["Male", "Female"], "pop_share": [50.97, 49.03], "death_share": [87.05, 12.95], "rate": [41.88, 6.48], "ratio": [1.71, 0.26], "deaths": [25569, 3803], "pop": [61051895, 58730930]}, "2004": {"groups": ["Male", "Female"], "pop_share": [50.83, 49.17], "death_share": [86.66, 13.34], "rate": [39.86, 6.34], "ratio": [1.7, 0.27], "deaths": [24992, 3847], "pop": [62692941, 60644414]}, "2005": {"groups": ["Male", "Female"], "pop_share": [50.61, 49.39], "death_share": [87.15, 12.85], "rate": [42.18, 6.37], "ratio": [1.72, 0.26], "deaths": [26096, 3849], "pop": [61874335, 60387459]}, "2006": {"groups": ["Male", "Female"], "pop_share": [50.94, 49.06], "death_share": [86.84, 13.16], "rate": [42.55, 6.69], "ratio": [1.7, 0.27], "deaths": [26153, 3963], "pop": [61470639, 59195742]}, "2007": {"groups": ["Male", "Female"], "pop_share": [50.74, 49.26], "death_share": [86.87, 13.13], "rate": [40.52, 6.31], "ratio": [1.71, 0.27], "deaths": [26442, 3996], "pop": [65252860, 63349920]}, "2008": {"groups": ["Male", "Female"], "pop_share": [50.4, 49.6], "death_share": [86.73, 13.27], "rate": [41.05, 6.38], "ratio": [1.72, 0.27], "deaths": [26768, 4095], "pop": [65200893, 64162688]}, "2009": {"groups": ["Male", "Female"], "pop_share": [50.42, 49.58], "death_share": [86.26, 13.74], "rate": [40.77, 6.61], "ratio": [1.71, 0.28], "deaths": [26365, 4200], "pop": [64672277, 63587576]}, "2010": {"groups": ["Male", "Female"], "pop_share": [50.37, 49.63], "death_share": [86.63, 13.37], "rate": [41.2, 6.45], "ratio": [1.72, 0.27], "deaths": [26781, 4133], "pop": [65003845, 64040680]}, "2011": {"groups": ["Male", "Female"], "pop_share": [50.43, 49.57], "death_share": [85.97, 14.03], "rate": [41.95, 6.97], "ratio": [1.7, 0.28], "deaths": [27062, 4418], "pop": [64506696, 63414242]}, "2012": {"groups": ["Male", "Female"], "pop_share": [50.64, 49.36], "death_share": [86.14, 13.86], "rate": [44.29, 7.31], "ratio": [1.7, 0.28], "deaths": [28158, 4529], "pop": [63575800, 61966683]}, "2013": {"groups": ["Male", "Female"], "pop_share": [51.1, 48.9], "death_share": [85.82, 14.18], "rate": [44.39, 7.66], "ratio": [1.68, 0.29], "deaths": [28110, 4643], "pop": [63321504, 60585629]}, "2014": {"groups": ["Male", "Female"], "pop_share": [50.5, 49.5], "death_share": [85.71, 14.29], "rate": [43.03, 7.32], "ratio": [1.7, 0.29], "deaths": [28036, 4674], "pop": [65157819, 63878699]}, "2015": {"groups": ["Male", "Female"], "pop_share": [50.81, 49.19], "death_share": [85.85, 14.15], "rate": [48.16, 8.2], "ratio": [1.69, 0.29], "deaths": [30306, 4995], "pop": [62925811, 60921645]}, "2016": {"groups": ["Male", "Female"], "pop_share": [50.45, 49.55], "death_share": [85.55, 14.45], "rate": [50.79, 8.73], "ratio": [1.7, 0.29], "deaths": [32234, 5443], "pop": [63469255, 62347917]}, "2017": {"groups": ["Male", "Female"], "pop_share": [50.41, 49.59], "death_share": [85.77, 14.23], "rate": [51.59, 8.7], "ratio": [1.7, 0.29], "deaths": [33260, 5516], "pop": [64470182, 63413365]}, "2018": {"groups": ["Male", "Female"], "pop_share": [50.19, 49.81], "death_share": [85.67, 14.33], "rate": [52.88, 8.91], "ratio": [1.71, 0.29], "deaths": [32799, 5485], "pop": [62028975, 61549107]}, "2019": {"groups": ["Male", "Female"], "pop_share": [50.6, 49.4], "death_share": [85.97, 14.03], "rate": [53.04, 8.87], "ratio": [1.7, 0.28], "deaths": [32821, 5355], "pop": [61880322, 60405681]}, "2020": {"groups": ["Male", "Female"], "pop_share": [50.46, 49.54], "death_share": [86.4, 13.6], "rate": [62.3, 9.98], "ratio": [1.71, 0.27], "deaths": [37656, 5925], "pop": [60444517, 59346114]}, "2021": {"groups": ["Male", "Female"], "pop_share": [50.57, 49.43], "death_share": [85.98, 14.02], "rate": [68.46, 11.42], "ratio": [1.7, 0.28], "deaths": [40567, 6617], "pop": [59258752, 57930898]}, "2022": {"groups": ["Male", "Female"], "pop_share": [50.76, 49.24], "death_share": [85.89, 14.11], "rate": [65.52, 11.09], "ratio": [1.69, 0.29], "deaths": [39848, 6545], "pop": [60818632, 59001195]}, "2023": {"groups": ["Male", "Female"], "pop_share": [50.49, 49.51], "death_share": [85.65, 14.35], "rate": [65.87, 11.25], "ratio": [1.7, 0.29], "deaths": [38533, 6457], "pop": [58499286, 57372570]}, "2024": {"groups": ["Male", "Female"], "pop_share": [51.02, 48.98], "death_share": [86.01, 13.99], "rate": [60.81, 10.3], "ratio": [1.69, 0.29], "deaths": [36683, 5967], "pop": [60327237, 57915121]}};
+const SEX_TREND  = {"Male": {"years": [1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024], "rates": [40.67, 40.45, 39.49, 41.83, 41.88, 39.86, 42.18, 42.55, 40.52, 41.05, 40.77, 41.2, 41.95, 44.29, 44.39, 43.03, 48.16, 50.79, 51.59, 52.88, 53.04, 62.3, 68.46, 65.52, 65.87, 60.81], "ratios": [1.7, 1.69, 1.69, 1.69, 1.71, 1.7, 1.72, 1.7, 1.71, 1.72, 1.71, 1.72, 1.7, 1.7, 1.68, 1.7, 1.69, 1.7, 1.7, 1.71, 1.7, 1.71, 1.7, 1.69, 1.7, 1.69]}, "Female": {"years": [1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024], "rates": [6.84, 6.73, 6.45, 6.76, 6.48, 6.34, 6.37, 6.69, 6.31, 6.38, 6.61, 6.45, 6.97, 7.31, 7.66, 7.32, 8.2, 8.73, 8.7, 8.91, 8.87, 9.98, 11.42, 11.09, 11.25, 10.3], "ratios": [0.29, 0.28, 0.28, 0.27, 0.26, 0.27, 0.26, 0.27, 0.27, 0.27, 0.28, 0.27, 0.28, 0.28, 0.29, 0.29, 0.29, 0.29, 0.29, 0.29, 0.28, 0.27, 0.28, 0.29, 0.29, 0.29]}};
+const OVERALL    = {"1999": 23.96, "2000": 23.89, "2001": 23.37, "2002": 24.74, "2003": 24.52, "2004": 23.38, "2005": 24.49, "2006": 24.96, "2007": 23.67, "2008": 23.86, "2009": 23.83, "2010": 23.96, "2011": 24.61, "2012": 26.04, "2013": 26.43, "2014": 25.35, "2015": 28.5, "2016": 29.95, "2017": 30.32, "2018": 30.98, "2019": 31.22, "2020": 36.38, "2021": 40.26, "2022": 38.72, "2023": 38.83, "2024": 36.07};
+const YEARS      = ["1999", "2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024"];
+const GC         = {"Black / AA": "#e74c3c", "White": "#5dade2", "Amer. Indian / AK": "#f39c12", "Asian / PI": "#a29bfe", "Asian": "#8e44ad", "Native Hawaiian / PI": "#27ae60", "Male": "#3498db", "Female": "#e91e8c"};
+
+let currentView='race', currentIdx=0, playing=false, playTimer=null;
+
+function getBar()  { return currentView==='race' ? RACE_BAR   : SEX_BAR;   }
+function getTrend(){ return currentView==='race' ? RACE_TREND : SEX_TREND; }
+
+// ── BAR CHART ─────────────────────────────────────────────────────────────────
+const POP_COLOR   = '#8d99ae';
+const DEATH_COLOR = '#d7301f';
+const barLayout = {
+  paper_bgcolor:'#1a1a1a', plot_bgcolor:'#1a1a1a', font:{color:'#eee'},
+  barmode:'group',
+  xaxis:{title:'Share of national total (%)', titlefont:{size:11},
+         tickfont:{size:9,color:'#aaa'}, gridcolor:'#282828', zeroline:false,
+         range:[0,105]},
+  yaxis:{tickfont:{size:9,color:'#ccc'}, gridcolor:'#282828', automargin:true},
+  margin:{t:6,b:34,l:130,r:16},
+  showlegend:true,
+  legend:{x:0.72,y:1.06,orientation:'h',font:{size:10,color:'#ccc'},
+          bgcolor:'rgba(0,0,0,0)'},
+  bargap:0.22, bargroupgap:0.06,
+};
+
+function barTraces(yd) {
+  const hov_pop   = yd.groups.map((g,i) =>
+    `<b>${g}</b><br>Population share: <b>${yd.pop_share[i]}%</b><br>Population: ${yd.pop[i].toLocaleString()}`);
+  const hov_death = yd.groups.map((g,i) =>
+    `<b>${g}</b><br>Death share: <b>${yd.death_share[i]}%</b><br>Deaths: ${yd.deaths[i].toLocaleString()}<br>Rate: ${yd.rate[i]}/100k<br>Disparity: <b>${yd.ratio[i]}×</b> national avg`);
+  return [
+    {type:'bar', orientation:'h', name:'% of population',
+     x:yd.pop_share, y:yd.groups, marker:{color:POP_COLOR, opacity:0.85},
+     customdata:hov_pop, hovertemplate:'%{customdata}<extra></extra>',
+     text:yd.pop_share.map(v=>`${v}%`), textposition:'outside', textfont:{size:9,color:'#aaa'}},
+    {type:'bar', orientation:'h', name:'% of gun deaths',
+     x:yd.death_share, y:yd.groups, marker:{color:DEATH_COLOR, opacity:0.9},
+     customdata:hov_death, hovertemplate:'%{customdata}<extra></extra>',
+     text:yd.death_share.map(v=>`${v}%`), textposition:'outside', textfont:{size:9,color:'#fff'}},
+  ];
+}
+
+// ── TREND CHART ────────────────────────────────────────────────────────────────
+const trendLayout = {
+  paper_bgcolor:'#1a1a1a', plot_bgcolor:'#1a1a1a', font:{color:'#eee'},
+  xaxis:{title:'Year', titlefont:{size:10}, tickfont:{size:9,color:'#aaa'},
+         gridcolor:'#242424', dtick:3},
+  yaxis:{title:'Deaths per 100k (own pop)', titlefont:{size:10},
+         tickfont:{size:9,color:'#aaa'}, gridcolor:'#242424', zeroline:false},
+  margin:{t:6,b:36,l:58,r:16},
+  showlegend:true,
+  legend:{x:0,y:1.04,orientation:'h',font:{size:9,color:'#ccc'},
+          bgcolor:'rgba(0,0,0,0)'},
+  hovermode:'x unified',
+};
+
+function trendTraces(trend, yearIdx) {
+  const selYear = parseInt(YEARS[yearIdx]);
+  const traces = Object.entries(trend).map(([grp, td]) => ({
+    type:'scatter', mode:'lines+markers', name:grp,
+    x:td.years, y:td.rates,
+    line:{color:GC[grp]||'#aaa', width:2},
+    marker:{size:4},
+    customdata:td.rates.map((r,i)=>`<b>${grp}</b>: ${r}/100k  (${td.ratios[i]}× avg)`),
+    hovertemplate:'%{customdata}<extra></extra>',
+  }));
+  // Year indicator line
+  traces.push({
+    type:'scatter', mode:'lines', name:'Selected year',
+    x:[selYear,selYear], y:[0,999], showlegend:false,
+    line:{color:'rgba(255,255,255,0.25)', width:1.5, dash:'dot'},
+    hoverinfo:'skip',
+  });
+  return traces;
+}
+
+// ── Initial render ─────────────────────────────────────────────────────────────
+function getYd() { return getBar()[YEARS[currentIdx]]; }
+
+Plotly.newPlot('bar-div',   barTraces(getYd()),                    barLayout,   {responsive:true,displayModeBar:false});
+Plotly.newPlot('trend-div', trendTraces(getTrend(), currentIdx),   trendLayout, {responsive:true,displayModeBar:false});
+
+// ── Update ────────────────────────────────────────────────────────────────────
+function update(idx) {
+  currentIdx = idx;
+  document.getElementById('yearLabel').textContent = YEARS[idx];
+  document.getElementById('yearSlider').value = idx;
+  const yd = getYd();
+  if (!yd) return;
+  Plotly.react('bar-div',   barTraces(yd),                   barLayout,   {responsive:true,displayModeBar:false});
+  Plotly.react('trend-div', trendTraces(getTrend(), idx),    trendLayout, {responsive:true,displayModeBar:false});
+}
+
+function switchView(v) {
+  currentView = v;
+  document.getElementById('btn-race').classList.toggle('active', v==='race');
+  document.getElementById('btn-sex').classList.toggle('active',  v==='sex');
+  update(currentIdx);
+}
+
+document.getElementById('yearSlider').addEventListener('input', function() {
+  stopPlay(); update(parseInt(this.value));
+});
+
+function stopPlay() {
+  playing=false; clearInterval(playTimer);
+  document.getElementById('playBtn').textContent='▶ Play';
+}
+document.getElementById('playBtn').addEventListener('click', function() {
+  if (playing) { stopPlay(); return; }
+  playing=true; this.textContent='⏸ Pause';
+  if (currentIdx >= YEARS.length-1) currentIdx=-1;
+  playTimer=setInterval(function(){
+    currentIdx++;
+    update(currentIdx);
+    if (currentIdx>=YEARS.length-1) stopPlay();
+  }, 700);
+});
+</script>
+</body></html>

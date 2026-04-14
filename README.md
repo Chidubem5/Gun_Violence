@@ -1,5 +1,9 @@
 # Gun Violence Heat Map
 
+
+## [► Proportional Impact — Who Bears the Burden?](https://chidubem5.github.io/Gun_Violence/gun_violence_disparity.html)
+> For each race group and sex: % of national population vs % of gun deaths side by side. The wider the gap, the more disproportionately affected. Bottom panel shows death rate per 100k of each group's own population over time.
+
 ## [► Combined View — Heat Map + State Rankings](https://chidubem5.github.io/Gun_Violence/gun_violence_combined.html)
 > Heat map and ranked bar chart side by side. Hover over a state on either chart to highlight it on the other. Shared play button and year slider animate both together.
 
