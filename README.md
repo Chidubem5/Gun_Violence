@@ -1,8 +1,10 @@
 # Gun Violence Heat Map
 
-## [► View the Interactive Map](https://chidubem5.github.io/Gun_Violence/gun_violence_heatmap.html)
+## [► View the Interactive Heat Map](https://chidubem5.github.io/Gun_Violence/gun_violence_heatmap.html)
+> Hover over any state to see gun death totals, race breakdown, and sex breakdown. Use the slider to move through years 1999–2024.
 
-> Click the link above to open the live heatmap — no code or installs needed. Hover over any state to see gun death totals, race breakdown, and sex breakdown. Use the slider to move through years 1999–2024.
+## [► View the Race Bar Chart](https://chidubem5.github.io/Gun_Violence/gun_violence_race_bar_chart.html)
+> States ranked highest → lowest by gun death rate. Select a race group from the dropdown and animate through years 1999–2024.
 
 ---
 
