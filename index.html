@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>US Gun Violence Data Explorer</title>
+<meta name="description" content="Data-driven visualizations of US gun violence patterns by geography, time, and demographics, adjusted for population proportionality." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg:           #f7f7f9;
+    --bg-card:      #ffffff;
+    --bg-card-hover:#f0ebff;
+    --text:         #161616;
+    --text-2:       #3d3d3d;
+    --text-muted:   #737373;
+    --accent:       #7c3aed;
+    --accent-dim:   #ede9fe;
+    --accent-2:     #0f62fe;
+    --border:       #e4e4e7;
+    --shadow:       0 2px 12px rgba(0,0,0,.07);
+    --shadow-lg:    0 8px 32px rgba(0,0,0,.10);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:           #0a0a0a;
+      --bg-card:      #1a1a1a;
+      --bg-card-hover:#26193d;
+      --text:         #f4f4f4;
+      --text-2:       #d4d4d4;
+      --text-muted:   #8d8d8d;
+      --accent:       #a78bfa;
+      --accent-dim:   #1e133a;
+      --accent-2:     #33b1ff;
+      --border:       #2a2a2a;
+      --shadow:       0 2px 12px rgba(0,0,0,.35);
+      --shadow-lg:    0 8px 32px rgba(0,0,0,.5);
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+  }
+  main {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 64px 24px 80px;
+  }
+  header { margin-bottom: 40px; }
+  h1 {
+    font-size: clamp(1.7rem, 4vw, 2.3rem);
+    font-weight: 800;
+    margin: 0 0 12px;
+    letter-spacing: -0.02em;
+  }
+  header p {
+    color: var(--text-muted);
+    font-size: 1.05rem;
+    line-height: 1.6;
+    max-width: 640px;
+    margin: 0;
+  }
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+    margin-bottom: 28px;
+    transition: color .15s ease;
+  }
+  .back-link:hover { color: var(--accent); }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+  }
+  .card {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    text-decoration: none;
+    color: inherit;
+    box-shadow: var(--shadow);
+    transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+  }
+  .card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+    background: var(--bg-card-hover);
+  }
+  .card .tag {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-dim);
+    padding: 4px 10px;
+    border-radius: 999px;
+    margin-bottom: 14px;
+    width: fit-content;
+  }
+  .card h2 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin: 0 0 8px;
+    letter-spacing: -0.01em;
+  }
+  .card p {
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: var(--text-2);
+    margin: 0 0 18px;
+    flex-grow: 1;
+  }
+  .card .cta {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--accent-2);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  footer {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+  footer a { color: var(--accent-2); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<main>
+  <a class="back-link" href="https://chidu.dev">&larr; chidu.dev</a>
+  <header>
+    <h1>US Gun Violence Data Explorer</h1>
+    <p>Four views into US firearm death data, built to challenge assumptions by looking at rates rather than raw counts. Pick a visualization below.</p>
+  </header>
+
+  <div class="grid">
+    <a class="card" href="gun_violence_combined.html">
+      <span class="tag">Map + Rankings</span>
+      <h2>Heat Map + State Rankings</h2>
+      <p>Interactive geospatial heat map of firearm deaths alongside a ranked state-by-state comparison.</p>
+      <span class="cta">Open visualization &rarr;</span>
+    </a>
+
+    <a class="card" href="gun_violence_heatmap.html">
+      <span class="tag">Geospatial</span>
+      <h2>Gun Violence Heat Map</h2>
+      <p>Concentration of firearm deaths across US states, viewable over time.</p>
+      <span class="cta">Open visualization &rarr;</span>
+    </a>
+
+    <a class="card" href="gun_violence_disparity.html">
+      <span class="tag">Demographics</span>
+      <h2>Proportional Impact by Race &amp; Sex</h2>
+      <p>Gun deaths by race and sex, adjusted for population share rather than shown as raw counts.</p>
+      <span class="cta">Open visualization &rarr;</span>
+    </a>
+
+    <a class="card" href="gun_violence_race_bar_chart.html">
+      <span class="tag">Demographics</span>
+      <h2>Race-Adjusted Rates by State</h2>
+      <p>State-level firearm death rates broken out by race, normalized against population.</p>
+      <span class="cta">Open visualization &rarr;</span>
+    </a>
+  </div>
+
+  <footer>
+    Data source: CDC WONDER Underlying Cause of Death. See the <a href="https://github.com/Chidubem5/Gun_Violence">GitHub repo</a> for methodology and data pipeline.
+  </footer>
+</main>
+</body>
+</html>
